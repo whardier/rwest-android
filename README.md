@@ -3,8 +3,8 @@ rwest-android
 
 File storage Read/Write HTTP REST service for Android (HTML5 and App Helper)
 
-REST API
---------
+Read/Write REST API
+-------------------
 
 The goal of this project is to support the following HTTP requests relative to the storage area for rwest-android
 
