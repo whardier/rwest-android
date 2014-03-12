@@ -10,6 +10,8 @@ The goal of this project is to support the following HTTP requests relative to t
 
 GET /action/read/path/to/file.txt
 
+GET /action/grep/path/to/file.txt?arg=content
+
 GET /action/head/path/to/file.txt?n=10
 
 GET /action/tail/path/to/file.txt?n=10
