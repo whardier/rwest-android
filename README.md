@@ -26,6 +26,12 @@ Typically {function}/{method}/{path or glob}?parameters
 
 ## Storage API Endpoints
 
+Paths to files are automatically created for all file write operations.
+
+Globbing is supported and can be confusing in 'raw' mode for read operations.
+
+Globbing is also supported for write operations.. use wisely.
+
 ### GET /storage/read/path/to/file.txt
 
 Read a file and return it
