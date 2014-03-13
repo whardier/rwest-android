@@ -23,7 +23,8 @@ import android.content.Context;
 public class WebServer extends Thread {
 	private static final String SERVER_NAME = "rwestful";
 	private static final String ALL_PATTERN = "*";
-
+	private static final String STORAGE_PATTERN = "/storage/*";
+	
 	private boolean isRunning = false;
 	private Context context = null;
 	private int serverPort = 0;
@@ -55,7 +56,8 @@ public class WebServer extends Thread {
 		registry = new HttpRequestHandlerRegistry();
 
 		registry.register(ALL_PATTERN, new HomePageHandler(context));
-
+		registry.register(STORAGE_PATTERN, new StorageHandler(context));
+		
 		httpService.setHandlerResolver(registry);
 	}
 
