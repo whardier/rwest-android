@@ -76,9 +76,12 @@ public class StorageWriteHandler implements HttpRequestHandler {
 		
         FileOutputStream f = new FileOutputStream(file);
 
+        final String newline = "\n".toString();
+        
 		for (int l = 0; l < lines.size(); l++) {
 		    String line = lines.get(l);
 		    f.write(line.getBytes());
+		    f.write(newline.getBytes());
 		}
 		
 		HttpEntity entity = new EntityTemplate(new ContentProducer() {
