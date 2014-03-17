@@ -52,6 +52,10 @@ Return the last 'count' lines in a file
 
 Return the last 'count' lines in a file since the last 'since' call on a file.
 
+### GET /storage/stat/path/to/file.txt
+
+Stat a file
+
 ### GET /storage/write/path/to/file.txt?(line=string&newline=true|data=base64encodeddata)
 
 Create or overwrite '/path/to/file.txt' and replace with line or data content.
