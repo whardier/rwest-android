@@ -1,6 +1,7 @@
 package com.rwestful.android.webserver.handlers.storage;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -57,6 +58,7 @@ public class StorageWriteHandler implements HttpRequestHandler {
 		
 		final File directory = new File(Environment.getExternalStoragePublicDirectory("stuff"), combined.toString());
 		final File file = new File(directory, filename);
+		final List<String> lines = uri.getQueryParameters("line");
 		
 		//List String pathsegments = uri.getPathSegments();
 		Log.i(LOG_TAG, uri.getLastPathSegment());
@@ -71,12 +73,19 @@ public class StorageWriteHandler implements HttpRequestHandler {
 		} else {
 			Log.i(LOG_TAG, "Directory ensured");
 		}
+		
+        FileOutputStream f = new FileOutputStream(file);
 
+		for (int l = 0; l < lines.size(); l++) {
+		    String line = lines.get(l);
+		    f.write(line.getBytes());
+		}
+		
 		HttpEntity entity = new EntityTemplate(new ContentProducer() {
 			public void writeTo(final OutputStream outstream) throws IOException {
 				OutputStreamWriter writer = new OutputStreamWriter(outstream, "UTF-8");
 				//String resp = Utility.openHTMLString(context, R.raw.home);
-
+								
 				writer.write(filename.toString());
 				writer.write('\n');
 				writer.write(file.toString());
