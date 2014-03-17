@@ -24,11 +24,13 @@ import android.util.Log;
 
 public class StorageWriteHandler implements HttpRequestHandler {
 	private Context context = null;
+	private Boolean append = null;
 
 	static final String LOG_TAG = "STORAGE_WRITE_HANDLER";
 
-	public StorageWriteHandler(Context context){
+	public StorageWriteHandler(Context context, Boolean append){
 		this.context = context;
+		this.append = append;
 	}
 
 	@Override
@@ -74,7 +76,7 @@ public class StorageWriteHandler implements HttpRequestHandler {
 			Log.i(LOG_TAG, "Directory ensured");
 		}
 		
-        FileOutputStream f = new FileOutputStream(file);
+        FileOutputStream f = new FileOutputStream(file, append);
 
         final String newline = "\n".toString();
         
@@ -83,6 +85,8 @@ public class StorageWriteHandler implements HttpRequestHandler {
 		    f.write(line.getBytes());
 		    f.write(newline.getBytes());
 		}
+		
+		f.close();
 		
 		HttpEntity entity = new EntityTemplate(new ContentProducer() {
 			public void writeTo(final OutputStream outstream) throws IOException {

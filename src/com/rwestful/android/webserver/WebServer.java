@@ -27,6 +27,7 @@ public class WebServer extends Thread {
 	private static final String SERVER_NAME = "rwestful";
 	private static final String ALL_PATTERN = "*";
 	private static final String STORAGE_WRITE_PATTERN = "/storage/write/*";
+	private static final String STORAGE_APPEND_PATTERN = "/storage/append/*";
 	
 	private boolean isRunning = false;
 	private Context context = null;
@@ -59,7 +60,8 @@ public class WebServer extends Thread {
 		registry = new HttpRequestHandlerRegistry();
 
 		registry.register(ALL_PATTERN, new HomePageHandler(context));
-		registry.register(STORAGE_WRITE_PATTERN, new StorageWriteHandler(context));
+		registry.register(STORAGE_WRITE_PATTERN, new StorageWriteHandler(context, false));
+		registry.register(STORAGE_APPEND_PATTERN, new StorageWriteHandler(context, true));
 		
 		httpService.setHandlerResolver(registry);
 	}
