@@ -20,10 +20,13 @@ import org.apache.http.protocol.ResponseServer;
 
 import android.content.Context;
 
+import com.rwestful.android.webserver.handlers.HomePageHandler;
+import com.rwestful.android.webserver.handlers.storage.StorageWriteHandler;
+
 public class WebServer extends Thread {
 	private static final String SERVER_NAME = "rwestful";
 	private static final String ALL_PATTERN = "*";
-	private static final String STORAGE_PATTERN = "/storage/*";
+	private static final String STORAGE_WRITE_PATTERN = "/storage/write/*";
 	
 	private boolean isRunning = false;
 	private Context context = null;
@@ -56,7 +59,7 @@ public class WebServer extends Thread {
 		registry = new HttpRequestHandlerRegistry();
 
 		registry.register(ALL_PATTERN, new HomePageHandler(context));
-		registry.register(STORAGE_PATTERN, new StorageHandler(context));
+		registry.register(STORAGE_WRITE_PATTERN, new StorageWriteHandler(context));
 		
 		httpService.setHandlerResolver(registry);
 	}
