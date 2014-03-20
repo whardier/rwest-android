@@ -1,9 +1,14 @@
-package com.rwestful.android.webserver.handlers;
+package com.rwestful.android.web.handlers;
 
+import org.apache.http.protocol.HttpRequestHandler;
+
+
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -12,38 +17,36 @@ import org.apache.http.entity.EntityTemplate;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
-import com.rwestful.android.constants.Constants;
-
 import android.content.Context;
+import android.util.Log;
 
-public class HomePageHandler implements HttpRequestHandler {
+public class DefaultHandler implements HttpRequestHandler {
 	
-	private Context context;
-    private static final String LOG_TAG = "HOMEPAGE_HANDLER";
+    static final String LOG_TAG = "DEFAULT_HANDLER";
 
-	public HomePageHandler(Context context){
-		this.context = context;
+	public DefaultHandler(Context context){
 	}
 
 	@Override
 	public void handle(HttpRequest request, HttpResponse response, HttpContext httpContext) throws HttpException, IOException {
+		String contentType = "text/html";
 		final String uriString = request.getRequestLine().getUri();
 	    
-		EntityTemplate entity = new EntityTemplate(new ContentProducer() {
+		// Do stuff here and create final status codes and stuff
+
+		Log.d(LOG_TAG, "Called");
+		
+		HttpEntity entity = new EntityTemplate(new ContentProducer() {
 			public void writeTo(final OutputStream outstream) throws IOException {
-				OutputStreamWriter writer = null;
-				try {
-					writer = new OutputStreamWriter(outstream, Constants.CHARSET_UTF8);
-					writer.write(uriString);
-				} finally {
-					if(writer != null) {
-						writer.close();
-					}
-				}
+				OutputStreamWriter writer = new OutputStreamWriter(outstream, "UTF-8");
+
+				writer.write(uriString);
+				writer.flush();
 			}
 		});
 
-		entity.setContentType(Constants.CONTENT_TYPE);
+		((EntityTemplate)entity).setContentType(contentType);
+
 		response.setEntity(entity);
 	}
 

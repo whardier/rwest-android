@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">rwestful</string>
+    <string name="app_name">Rwestful</string>
     <string name="action_settings">Settings</string>
-    <string name="warming_up">warming up...</string>
+    <string name="title_section1">Status</string>
+    <string name="title_section2">Logs</string>
+    <string name="title_section3">Other Stuff</string>
 
 </resources>

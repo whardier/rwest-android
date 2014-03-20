@@ -1,0 +1,15 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="start_server_on_app_start"
+        android:summary="@string/pref_description_start_server_on_app_start"                                 
+        android:title="@string/pref_title_start_server_on_app_start" />
+    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="start_server_on_boot"
+        android:summary="@string/pref_description_start_server_on_boot"
+        android:title="@string/pref_title_start_server_on_boot" />
+
+</PreferenceScreen>

@@ -1,0 +1,20 @@
+<resources>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_start_server_on_app_start">Start Service on App Start</string>
+    <string name="pref_description_start_server_on_app_start">Make sure the service is running each time your start this application.</string>
+    <string name="pref_title_start_server_on_boot">Start Service on Boot</string>
+    <string name="pref_description_start_server_on_boot">Make sure the service is running each time your device reboots.</string>
+
+    <!-- Example settings for Server -->
+    <string name="pref_header_server">Server</string>
+    <string name="pref_title_server_listen_localhost_only">Localhost Only</string>
+    <string name="pref_description_server_listen_localhost_only">If checked the server will only listen to requests to localhost (127.0.0.1)</string>
+
+</resources>
