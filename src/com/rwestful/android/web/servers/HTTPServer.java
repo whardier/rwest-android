@@ -70,10 +70,12 @@ public class HTTPServer extends Thread {
 
 		registry = new HttpRequestHandlerRegistry();
 
+		//FIXME: Passing the context doesn't seem to work too great from threads without using a handler
+		
 		registry.register(ALL_PATTERN, new DefaultHandler(context));
 		registry.register(STORAGE_WRITE_PATTERN, new StorageWriteHandler(context, false));
-		registry.register(STORAGE_APPEND_PATTERN, new StorageWriteHandler(context, true));
-
+		registry.register(STORAGE_APPEND_PATTERN, new StorageWriteHandler(context, true));		
+		
 		httpService.setHandlerResolver(registry);
 	}
 

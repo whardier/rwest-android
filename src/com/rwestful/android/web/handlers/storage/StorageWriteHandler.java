@@ -23,13 +23,12 @@ import android.os.Environment;
 import android.util.Log;
 
 public class StorageWriteHandler implements HttpRequestHandler {
-	private Context context = null;
+	
 	private Boolean append = null;
 
 	static final String LOG_TAG = "STORAGE_WRITE_HANDLER";
-
+	
 	public StorageWriteHandler(Context context, Boolean append){
-		this.context = context;
 		this.append = append;
 	}
 

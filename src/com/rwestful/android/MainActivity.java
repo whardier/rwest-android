@@ -1,6 +1,5 @@
 package com.rwestful.android;
 
-import java.net.ServerSocket;
 import java.util.Locale;
 
 import android.app.ActionBar;
