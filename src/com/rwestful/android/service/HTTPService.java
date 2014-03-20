@@ -20,15 +20,12 @@ public class HTTPService extends Service {
 	@Override
 	public void onDestroy() {
 		server.stopThread();
-
 		super.onDestroy();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
 		server.startThread();
-
 		return START_STICKY;
 	}
 

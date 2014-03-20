@@ -56,9 +56,7 @@ public class WebServer extends Thread {
 				new DefaultConnectionReuseStrategy(),
 				new DefaultHttpResponseFactory());
 
-
 		registry = new HttpRequestHandlerRegistry();
-
 		registry.register(ALL_PATTERN, new HomePageHandler(context));
 		registry.register(STORAGE_WRITE_PATTERN, new StorageWriteHandler(context, false));
 		registry.register(STORAGE_APPEND_PATTERN, new StorageWriteHandler(context, true));
@@ -70,12 +68,13 @@ public class WebServer extends Thread {
 	public void run() {
 		super.run();
 
+		ServerSocket serverSocket = null;
 		try {
-			ServerSocket serverSocket = new ServerSocket(serverPort);
+			serverSocket = new ServerSocket(serverPort);
 
 			serverSocket.setReuseAddress(true);
 
-			while(isRunning){
+			while(isRunning) {
 				try {
 					final Socket socket = serverSocket.accept();
 
@@ -92,17 +91,20 @@ public class WebServer extends Thread {
 					e.printStackTrace();
 				}
 			}
-
-			serverSocket.close();
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if(serverSocket != null) {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 	}
 
 	public synchronized void startThread() {
 		isRunning = true;
-
 		super.start();
 	}
 

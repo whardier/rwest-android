@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 
 import java.util.List;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -17,16 +16,18 @@ import org.apache.http.entity.EntityTemplate;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
+import com.rwestful.android.constants.Constants;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
 public class StorageWriteHandler implements HttpRequestHandler {
-	private Context context = null;
-	private Boolean append = null;
+	private Context context;
+	private Boolean append;
 
-	static final String LOG_TAG = "STORAGE_WRITE_HANDLER";
+	private static final String LOG_TAG = "STORAGE_WRITE_HANDLER";
 
 	public StorageWriteHandler(Context context, Boolean append){
 		this.context = context;
@@ -35,7 +36,6 @@ public class StorageWriteHandler implements HttpRequestHandler {
 
 	@Override
 	public void handle(HttpRequest request, HttpResponse response, HttpContext httpContext) throws HttpException, IOException {
-		String contentType = "text/html";
 		final String uriString = request.getRequestLine().getUri();
 		Uri uri = Uri.parse(uriString);
 
@@ -48,17 +48,12 @@ public class StorageWriteHandler implements HttpRequestHandler {
 		final List<String> directorysegments = pathsegments.subList(3,  pathsegments.size()-1);		
 		final String filename = uri.getLastPathSegment();
 		
-		File combined = new File(directorysegments.get(0));
-
-		int i = 1;
-		
-		while ( i < directorysegments.size())
-		{
-		    combined = new File(combined, directorysegments.get(i));
-		    ++i;
+		File combined = null;
+		for(String directory : directorysegments) {
+			combined = new File(combined, directory);
 		}
 		
-		final File directory = new File(Environment.getExternalStoragePublicDirectory("stuff"), combined.toString());
+		final File directory = new File(Environment.getExternalStoragePublicDirectory(Constants.STORAGE_FOLDER), combined.toString());
 		final File file = new File(directory, filename);
 		final List<String> lines = uri.getQueryParameters("line");
 		
@@ -70,40 +65,44 @@ public class StorageWriteHandler implements HttpRequestHandler {
 		Log.i(LOG_TAG, combined.toString());
 		Log.i(LOG_TAG, pathsegments.subList(3, pathsegments.size()-1).toString());
 		
-		if (!directory.mkdirs()) {
-			Log.e(LOG_TAG, "Directory not created");
-		} else {
-			Log.i(LOG_TAG, "Directory ensured");
+		String directorymessage = (!directory.mkdirs()) ? "Directory not created" : "Directory ensured";
+		Log.e(LOG_TAG, directorymessage);
+		
+		FileOutputStream fileOutputSteam = null;
+		final String newline = System.getProperty("line.separator");
+		try {
+			fileOutputSteam = new FileOutputStream(file, append);
+	        for(String line : lines) {
+	        	fileOutputSteam.write(line.getBytes());
+	        	fileOutputSteam.write(newline.getBytes());
+	        }
+		} finally {
+			if(fileOutputSteam != null) {
+				fileOutputSteam.close();
+			}
 		}
 		
-        FileOutputStream f = new FileOutputStream(file, append);
-
-        final String newline = "\n".toString();
-        
-		for (int l = 0; l < lines.size(); l++) {
-		    String line = lines.get(l);
-		    f.write(line.getBytes());
-		    f.write(newline.getBytes());
-		}
-		
-		f.close();
-		
-		HttpEntity entity = new EntityTemplate(new ContentProducer() {
+		EntityTemplate entity = new EntityTemplate(new ContentProducer() {
 			public void writeTo(final OutputStream outstream) throws IOException {
-				OutputStreamWriter writer = new OutputStreamWriter(outstream, "UTF-8");
-				//String resp = Utility.openHTMLString(context, R.raw.home);
-								
-				writer.write(filename.toString());
-				writer.write('\n');
-				writer.write(file.toString());
-				writer.write('\n');				
-				writer.write(directory.toString());
-				writer.flush();
+				OutputStreamWriter writer = null;
+				try {
+					writer = new OutputStreamWriter(outstream, Constants.CHARSET_UTF8);
+					//String resp = Utility.openHTMLString(context, R.raw.home);
+									
+					writer.write(filename.toString());
+					writer.write(newline);
+					writer.write(file.toString());
+					writer.write(newline);				
+					writer.write(directory.toString());
+				} finally {
+					if(writer != null) {
+						writer.close();
+					}
+				}
 			}
 		});
 
-		((EntityTemplate)entity).setContentType(contentType);
-
+		entity.setContentType(Constants.CONTENT_TYPE);
 		response.setEntity(entity);
 	}
 

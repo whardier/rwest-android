@@ -19,7 +19,6 @@ public class MainActivity extends Activity {
 		intent = new Intent(MainActivity.this, HTTPService.class);
 
 		startService(intent);
-
 	}
 
 
