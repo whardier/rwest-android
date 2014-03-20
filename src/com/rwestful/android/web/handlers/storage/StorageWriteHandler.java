@@ -22,94 +22,109 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
+import com.rwestful.android.constants.Constants;
+
 public class StorageWriteHandler implements HttpRequestHandler {
-	
+
 	private Boolean append = null;
 
 	static final String LOG_TAG = "STORAGE_WRITE_HANDLER";
-	
-	public StorageWriteHandler(Context context, Boolean append){
+
+	public StorageWriteHandler(Boolean append) {
 		this.append = append;
 	}
 
 	@Override
-	public void handle(HttpRequest request, HttpResponse response, HttpContext httpContext) throws HttpException, IOException {
+	public void handle(HttpRequest request, HttpResponse response,
+			HttpContext httpContext) throws HttpException, IOException {
 		String contentType = "text/html";
 		final String uriString = request.getRequestLine().getUri();
 		Uri uri = Uri.parse(uriString);
 
 		Log.i(LOG_TAG, uri.getPath());
 		Log.i(LOG_TAG, uri.getPathSegments().toString());
-		
+
 		final List<String> pathsegments = uri.getPathSegments();
 		Log.i(LOG_TAG, uri.getPathSegments().toString());
 		final String command = pathsegments.get(0);
 		Log.i(LOG_TAG, uri.getPathSegments().toString());
 		final String function = pathsegments.get(1);
 		Log.i(LOG_TAG, uri.getPathSegments().toString());
-		final List<String> directorysegments = pathsegments.subList(2,  pathsegments.size()-1);
+		final List<String> directorysegments = pathsegments.subList(2, pathsegments.size() - 1);
 		Log.i(LOG_TAG, uri.getPathSegments().toString());
-		final String filename = uri.getLastPathSegment();		
+		final String filename = uri.getLastPathSegment();
 		Log.i(LOG_TAG, uri.getPathSegments().toString());
 		Log.i(LOG_TAG, directorysegments.toString());
 		Log.i(LOG_TAG, filename);
 
-		//FIXME: Handle it when directorysegments has no elements
-		File combined = new File(directorysegments.get(0));
+		// Boom baby.. combined can never be null since it is appended later on
+		File combined = new File(File.separator);
 
-		int i = 1;
-		
-		while ( i < directorysegments.size())
-		{
-		    combined = new File(combined, directorysegments.get(i));
-		    ++i;
+		for (String directory : directorysegments) {
+			combined = new File(combined, directory);
 		}
+
+		final File directory = new File(
+				Environment
+						.getExternalStoragePublicDirectory(Constants.STORAGE_FOLDER),
+				combined.toString());
 		
-		final File directory = new File(Environment.getExternalStoragePublicDirectory("stuff"), combined.toString());
 		final File file = new File(directory, filename);
 		final List<String> lines = uri.getQueryParameters("line");
-		
-		//List String pathsegments = uri.getPathSegments();
+
+		// List String pathsegments = uri.getPathSegments();
 		Log.i(LOG_TAG, uri.getLastPathSegment());
 		Log.i(LOG_TAG, uri.getQueryParameters("line").toString());
 		Log.i(LOG_TAG, command);
 		Log.i(LOG_TAG, function);
 		Log.i(LOG_TAG, combined.toString());
-		Log.i(LOG_TAG, pathsegments.subList(3, pathsegments.size()-1).toString());
-		
+		Log.i(LOG_TAG, pathsegments.subList(2, pathsegments.size() - 1)
+				.toString());
+
 		if (!directory.mkdirs()) {
 			Log.e(LOG_TAG, "Directory not created");
 		} else {
 			Log.i(LOG_TAG, "Directory ensured");
 		}
-		
-        FileOutputStream f = new FileOutputStream(file, append);
 
-        final String newline = "\n".toString();
-        
-		for (int l = 0; l < lines.size(); l++) {
-		    String line = lines.get(l);
-		    f.write(line.getBytes());
-		    f.write(newline.getBytes());
+		FileOutputStream fileOutputSteam = null;
+
+		final String newline = System.getProperty("line.separator");
+
+		try {
+			fileOutputSteam = new FileOutputStream(file, append);
+			for (String line : lines) {
+				fileOutputSteam.write(line.getBytes());
+				fileOutputSteam.write(newline.getBytes());
+			}
+		} finally {
+			if (fileOutputSteam != null) {
+				fileOutputSteam.close();
+			}
 		}
-		
-		f.close();
-		
-		HttpEntity entity = new EntityTemplate(new ContentProducer() {
-			public void writeTo(final OutputStream outstream) throws IOException {
-				OutputStreamWriter writer = new OutputStreamWriter(outstream, "UTF-8");
-				//String resp = Utility.openHTMLString(context, R.raw.home);
-								
-				writer.write(filename.toString());
-				writer.write('\n');
-				writer.write(file.toString());
-				writer.write('\n');				
-				writer.write(directory.toString());
-				writer.flush();
+
+		EntityTemplate entity = new EntityTemplate(new ContentProducer() {
+			public void writeTo(final OutputStream outstream)
+					throws IOException {
+				OutputStreamWriter writer = null;
+				try {
+					writer = new OutputStreamWriter(outstream,
+							Constants.CHARSET_UTF8);
+
+					writer.write(filename.toString());
+					writer.write(newline);
+					writer.write(file.toString());
+					writer.write(newline);
+					writer.write(directory.toString());
+				} finally {
+					if (writer != null) {
+						writer.close();
+					}
+				}
 			}
 		});
 
-		((EntityTemplate)entity).setContentType(contentType);
+		entity.setContentType(Constants.CONTENT_TYPE);
 
 		response.setEntity(entity);
 	}

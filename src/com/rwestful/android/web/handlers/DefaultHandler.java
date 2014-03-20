@@ -22,7 +22,7 @@ public class DefaultHandler implements HttpRequestHandler {
 
 	static final String LOG_TAG = "DEFAULT_HANDLER";
 
-	public DefaultHandler(Context context){
+	public DefaultHandler(){
 	}
 
 	@Override

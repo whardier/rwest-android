@@ -20,12 +20,15 @@ import org.apache.http.protocol.ResponseDate;
 import org.apache.http.protocol.ResponseServer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
+import com.rwestful.android.MainActivity;
 import com.rwestful.android.R;
 
 import com.rwestful.android.web.handlers.DefaultHandler;
@@ -49,7 +52,7 @@ public class HTTPServer extends Thread {
 	private HttpService httpService = null;
 	private HttpRequestHandlerRegistry registry = null;
 
-	public HTTPServer(Context context){
+	public HTTPServer(Context context) {
 		super(SERVER_NAME);
 
 		this.setContext(context);
@@ -63,19 +66,19 @@ public class HTTPServer extends Thread {
 		httpproc.addInterceptor(new ResponseContent());
 		httpproc.addInterceptor(new ResponseConnControl());
 
-		httpService = new HttpService(httpproc, 
+		httpService = new HttpService(httpproc,
 				new DefaultConnectionReuseStrategy(),
 				new DefaultHttpResponseFactory());
 
-
 		registry = new HttpRequestHandlerRegistry();
 
-		//FIXME: Passing the context doesn't seem to work too great from threads without using a handler
-		
-		registry.register(ALL_PATTERN, new DefaultHandler(context));
-		registry.register(STORAGE_WRITE_PATTERN, new StorageWriteHandler(context, false));
-		registry.register(STORAGE_APPEND_PATTERN, new StorageWriteHandler(context, true));		
-		
+		// FIXME: Passing the context doesn't seem to work too great from
+		// threads without using a handler
+
+		registry.register(ALL_PATTERN, new DefaultHandler());
+		registry.register(STORAGE_WRITE_PATTERN, new StorageWriteHandler(false));
+		registry.register(STORAGE_APPEND_PATTERN, new StorageWriteHandler(true));
+
 		httpService.setHandlerResolver(registry);
 	}
 
@@ -85,22 +88,26 @@ public class HTTPServer extends Thread {
 	public void run() {
 		super.run();
 
-		try {	
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);			
-			
+		try {
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(context);
+
 			serverSocket = new ServerSocket();
-					
-			serverSocket.setReuseAddress(true);					
+
+			serverSocket.setReuseAddress(true);
 
 			if (prefs.getBoolean("server_listen_localhost_only", true)) {
-				serverSocket.bind(new InetSocketAddress("127.0.0.1", serverPort));
+				serverSocket
+						.bind(new InetSocketAddress("127.0.0.1", serverPort));
 			} else {
 				serverSocket.bind(new InetSocketAddress(serverPort));
 			}
-			
-			setForegroundNotificationText("http://" + serverSocket.getInetAddress().toString() + ":" + serverSocket.getLocalPort() + "/");
-			
-			while(isRunning){
+
+			//setForegroundNotificationText("http://"
+			//		+ serverSocket.getInetAddress().toString() + ":"
+			//		+ serverSocket.getLocalPort() + "/");
+
+			while (isRunning) {
 				try {
 					final Socket socket = serverSocket.accept();
 
@@ -115,12 +122,11 @@ public class HTTPServer extends Thread {
 					e.printStackTrace();
 				} catch (HttpException e) {
 					e.printStackTrace();
-				}
+				} 
 			}
 
 			serverSocket.close();
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -130,7 +136,7 @@ public class HTTPServer extends Thread {
 		super.start();
 	}
 
-	public synchronized void stopThread(){
+	public synchronized void stopThread() {
 		isRunning = false;
 		if (serverSocket != null) {
 			try {
@@ -148,21 +154,4 @@ public class HTTPServer extends Thread {
 	public Context getContext() {
 		return context;
 	}
-
-	//FIXME: Move this to a utility class
-	private void setForegroundNotificationText(String text) {
-		// mId allows you to update the notification later on.
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				context);
-		NotificationManager mNotificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		mBuilder.setSmallIcon(R.drawable.ic_launcher);
-		mBuilder.setContentTitle(context.getString(R.string.app_name));
-		mBuilder.setContentText(text);
-		mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-		// Sleeps the thread, simulating an operation
-		// Removes the progress bar
-	}
-
 }
