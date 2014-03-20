@@ -51,7 +51,7 @@ public class HTTPService extends Service {
 
 		server = new HTTPServer(this);        
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
