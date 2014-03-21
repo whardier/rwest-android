@@ -19,6 +19,10 @@ public class HTTPService extends Service {
 	private final static int NOTIFICATION_ID = 0xA;
 	private HTTPServer server = null;
 
+	public SharedPreferences sharedPreferences;
+
+	public static boolean isTestCase = false;
+	
 	public HTTPService() {
 	}
 
@@ -41,7 +45,11 @@ public class HTTPService extends Service {
 		Notification notification = serviceNotificationBuilder.build();
 		notification.flags |= Notification.FLAG_NO_CLEAR;
 
-		startForeground(NOTIFICATION_ID, notification);
+		// Horrible workaround for Android bug. 
+		// For more info, see http://stackoverflow.com/questions/13358386/service-startforeground-throws-nullpointerexception-when-run-with-servicetestc
+		if(!isTestCase) {
+			startForeground(NOTIFICATION_ID, notification);
+		}
 
 		server = new HTTPServer(this);
 		
@@ -50,7 +58,9 @@ public class HTTPService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		server.stopThread();
+		if(server != null) {
+			server.stopThread();
+		}
 	}
 
 	@Override

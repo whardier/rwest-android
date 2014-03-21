@@ -28,6 +28,10 @@
         android:name="android.permission.ACCESS_NETWORK_STATE"
         android:required="true" />
 
+    <instrumentation 
+        android:name="android.test.InstrumentationTestRunner"
+    	android:targetPackage="test.com.rwestful.android" />
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -70,6 +74,8 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        
+        <uses-library android:name="android.test.runner" />
     </application>
 
 </manifest>
