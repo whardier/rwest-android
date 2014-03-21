@@ -7,7 +7,6 @@ import com.rwestful.android.web.servers.HTTPServer;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import android.app.Notification;
@@ -20,16 +19,11 @@ public class HTTPService extends Service {
 	private final static int NOTIFICATION_ID = 0xA;
 	private HTTPServer server = null;
 
-	public SharedPreferences sharedPreferences;
-
 	public HTTPService() {
 	}
 
 	@Override
 	public void onCreate() {
-
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);    	
-		android.util.Log.v("HTTPSERVICE", sharedPreferences.getAll().toString());
 
 		NotificationCompat.Builder serviceNotificationBuilder = new NotificationCompat.Builder(
 				this).setSmallIcon(R.drawable.ic_launcher)
@@ -49,7 +43,8 @@ public class HTTPService extends Service {
 
 		startForeground(NOTIFICATION_ID, notification);
 
-		server = new HTTPServer(this);        
+		server = new HTTPServer(this);
+		
 	}
 
 	@Override
@@ -60,7 +55,8 @@ public class HTTPService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		server.startThread();
+		
+		server.startThread();		
 		return Service.START_STICKY;
 	}    
 
